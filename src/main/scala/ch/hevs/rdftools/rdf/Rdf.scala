@@ -3,12 +3,17 @@ package ch.hevs.rdftools.rdf
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.joda.time.DateTime
 import scala.language.implicitConversions
+import java.net.URLEncoder
 
 trait RdfTerm
 
 case class Iri(value:String) extends RdfTerm{
   override def toString=value
   lazy val localName=value.split(Array('/','#')).last
+  def +(str:String):Iri=Iri(value+str)
+}
+object Iri {
+  def iri(str:String)=Iri(URLEncoder.encode(str,"UTF-8"))
 }
 
 trait Literal extends RdfTerm{

@@ -23,7 +23,10 @@ object JenaTools {
   
   def toJenaRes(s:String)=
     ResourceFactory.createResource(s)  
-  
+
+  def toJenaRes(iri:Iri)=
+    ResourceFactory.createResource(iri.value)  
+
   implicit def toIriNode(s:String)=
     NodeFactory.createURI(s)
 
@@ -38,6 +41,7 @@ object JenaTools {
   }
  
   def iri(n:Node)=Iri(n.getURI)
+  
   implicit def fromNode(n:Node)=n match {
     case i:Node_URI=> iri(i.getURI)
     case l: org.apache.jena.rdf.model.Literal =>Literal.lit(l.getString) 
