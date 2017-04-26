@@ -1,9 +1,9 @@
-package ch.hevs.rdftools.rdf.api
+package rdftools.rdf.api 
 
 import org.apache.jena.graph.NodeFactory
 import org.apache.jena.graph.Triple
-import ch.hevs.rdftools.rdf.{Triple=>RdfTriple}
-import ch.hevs.rdftools.rdf._
+import rdftools.rdf.{Triple=>RdfTriple}
+import rdftools.rdf._
 import org.apache.jena.rdf.model.AnonId
 import org.apache.jena.graph.Node
 import org.apache.jena.datatypes.xsd.XSDDatatype
@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.ResourceFactory
 import scala.language.implicitConversions
 import org.apache.jena.graph.BlankNodeId
 import org.apache.jena.graph.Node_URI
+
 
 package object JenaTypes {
   type TripleList = java.util.List[Triple]
@@ -27,11 +28,17 @@ object JenaTools {
   def toJenaRes(iri:Iri)=
     ResourceFactory.createResource(iri.value)  
 
+  implicit def toJenaNode(clazz:Class)=
+    ResourceFactory.createResource(clazz.iri.value)  
+
   implicit def toIriNode(s:String)=
     NodeFactory.createURI(s)
 
   implicit def toJenaProperty(iri:Iri)=
     ResourceFactory.createProperty(iri.value)
+
+  implicit def toJenaProperty(prop:Property)=
+    ResourceFactory.createProperty(prop.iri.value)
 
   implicit def toJenaLit(lit:AnyLiteral)=
     ResourceFactory.createPlainLiteral(lit.value.toString)

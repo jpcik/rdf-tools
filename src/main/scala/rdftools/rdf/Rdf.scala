@@ -1,4 +1,4 @@
-package ch.hevs.rdftools.rdf
+package rdftools.rdf
 
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.joda.time.DateTime
