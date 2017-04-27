@@ -11,7 +11,11 @@ import org.apache.jena.rdf.model.ResourceFactory
 import scala.language.implicitConversions
 import org.apache.jena.graph.BlankNodeId
 import org.apache.jena.graph.Node_URI
-
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.RDFList
+import org.apache.jena.rdf.model.Container
+import org.apache.jena.rdf.model.{Literal=>JenaLiteral}
+import org.apache.jena.rdf.model.RDFNode
 
 package object JenaTypes {
   type TripleList = java.util.List[Triple]
@@ -57,6 +61,24 @@ object JenaTools {
   implicit def fromJenaTriple(t:Triple):RdfTriple={
     RdfTriple(iri(t.getSubject),iri(t.getPredicate),t.getObject)
   }
+  
+  
+  def +=(s:Iri,p:Iri,o:Iri)(implicit m:Model)={
+    m.add(s,p,o)
+  }
+  def +=(s:Iri,p:Iri,o:String)(implicit m:Model)={
+    m.add(toJenaRes(s),p,o)
+  }
+  def +=(s:Iri,p:Iri,o:JenaLiteral)(implicit m:Model)={
+    m.add(s,p,o)
+  }
+  def +=(s:Iri,p:Iri,list:RDFList)(implicit m:Model)={
+    m.add(s,p,list)
+  } 
+  def +=(s:Iri,p:Iri,cont:Container)(implicit m:Model)={
+    m.add(s,p,cont)
+  } 
+  
   
   implicit def toJenaNode(t:RdfTerm):Node=t match {
     case i:Iri=>createURI(i.toString)
