@@ -9,7 +9,7 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.3.1",
   "joda-time" % "joda-time" % "2.9.9",
   "com.eed3si9n" %% "treehugger" % "0.4.1",
-  "org.apache.jena" % "apache-jena-libs" % "3.1.0",
+  "org.apache.jena" % "apache-jena-libs" % "3.3.0",
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",
   "junit" % "junit" % "4.12" % "test"
 )

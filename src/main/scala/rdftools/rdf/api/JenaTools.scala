@@ -4,6 +4,7 @@ import org.apache.jena.graph.NodeFactory
 import org.apache.jena.graph.Triple
 import rdftools.rdf.{Triple=>RdfTriple}
 import rdftools.rdf._
+import rdftools.rdf.RdfTools._
 import org.apache.jena.rdf.model.AnonId
 import org.apache.jena.graph.Node
 import org.apache.jena.datatypes.xsd.XSDDatatype
@@ -16,6 +17,7 @@ import org.apache.jena.rdf.model.RDFList
 import org.apache.jena.rdf.model.Container
 import org.apache.jena.rdf.model.{Literal=>JenaLiteral}
 import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.rdf.model.Resource
 
 package object JenaTypes {
   type TripleList = java.util.List[Triple]
@@ -30,19 +32,19 @@ object JenaTools {
     ResourceFactory.createResource(s)  
 
   def toJenaRes(iri:Iri)=
-    ResourceFactory.createResource(iri.value)  
+    ResourceFactory.createResource(iri.path)  
 
   implicit def toJenaNode(clazz:Class)=
-    ResourceFactory.createResource(clazz.iri.value)  
+    ResourceFactory.createResource(clazz.iri.path)  
 
   implicit def toIriNode(s:String)=
     NodeFactory.createURI(s)
 
   implicit def toJenaProperty(iri:Iri)=
-    ResourceFactory.createProperty(iri.value)
+    ResourceFactory.createProperty(iri.path)
 
   implicit def toJenaProperty(prop:Property)=
-    ResourceFactory.createProperty(prop.iri.value)
+    ResourceFactory.createProperty(prop.iri.path)
 
   implicit def toJenaLit(lit:AnyLiteral)=
     ResourceFactory.createPlainLiteral(lit.value.toString)
@@ -52,19 +54,20 @@ object JenaTools {
   }
  
   def iri(n:Node)=Iri(n.getURI)
-  
+  /*
   implicit def fromNode(n:Node)=n match {
     case i:Node_URI=> iri(i.getURI)
-    case l: org.apache.jena.rdf.model.Literal =>Literal.lit(l.getString) 
+    case l: org.apache.jena.rdf.model.Literal =>lit(l.getString) 
   }
-  
+  */
+  /*
   implicit def fromJenaTriple(t:Triple):RdfTriple={
     RdfTriple(iri(t.getSubject),iri(t.getPredicate),t.getObject)
   }
-  
+  */
   
   def +=(s:Iri,p:Iri,o:Iri)(implicit m:Model)={
-    m.add(s,p,o)
+    m.add(s:Resource,p,o:Resource)
   }
   def +=(s:Iri,p:Iri,o:String)(implicit m:Model)={
     m.add(toJenaRes(s),p,o)
