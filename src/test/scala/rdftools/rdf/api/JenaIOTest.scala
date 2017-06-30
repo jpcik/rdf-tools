@@ -4,7 +4,7 @@ import rdftools.rdf.ParentTest
 import org.apache.jena.riot.RDFDataMgr
 import collection.JavaConversions._
 import rdftools.rdf.Triple
-import rdftools.rdf.api.JenaGraphTools._
+import rdftools.rdf.api.JenaGraphs._
 import rdftools.rdf.RdfIO
 
 class JenaIOTest extends ParentTest{

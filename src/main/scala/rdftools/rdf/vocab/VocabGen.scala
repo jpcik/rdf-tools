@@ -76,6 +76,7 @@ object VocabGen {
     
     conf.getConfigList("vocabs").foreach { voc => 
       val meta=readVocab(voc.getString("url"))
+      println(s"write vocab: $meta")
       val vocabId=voc.getString("id")
       val pack=voc.getString("package")
       val vconf=VocabConf(vocabId,meta.uri,pack)
@@ -85,6 +86,7 @@ object VocabGen {
       val fw=new FileWriter(file)
       fw.write(treeToString(genTree(vconf,meta)))
       fw.close
+      println(s"written vocab: $meta")
   
     }
   

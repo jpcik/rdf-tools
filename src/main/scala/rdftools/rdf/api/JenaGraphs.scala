@@ -2,15 +2,12 @@ package rdftools.rdf.api
 
 import org.apache.jena.graph.{Triple=>JenaTriple}
 import org.apache.jena.graph.{Graph=>JenaGraph}
-import rdftools.rdf.Triple
 import org.apache.jena.graph.Node
-import rdftools.rdf.RdfTerm
+import rdftools.rdf._
 import rdftools.rdf.RdfTools._
-import rdftools.rdf.Iri
-import rdftools.rdf.Graph
 import collection.JavaConversions._
 
-object JenaGraphTools {
+object JenaGraphs {
   implicit class JenaNodePlus(jn:Node) extends RdfTerm {
     def asIri:Iri=jn.getURI
     def asBnode=bnode(jn.getBlankNodeLabel)
