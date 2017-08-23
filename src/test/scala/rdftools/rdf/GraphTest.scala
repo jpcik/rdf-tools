@@ -19,7 +19,5 @@ class GraphTest extends FlatSpec with Matchers  {
      g.triples.size shouldBe (5)
      
        
-    }
-    
-    
+    }    
 }
