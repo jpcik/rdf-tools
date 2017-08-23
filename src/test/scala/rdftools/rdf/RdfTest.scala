@@ -25,15 +25,15 @@ class RdfTest extends FlatSpec with Matchers  {
     "A literal" should "make" in{
       val lit1=lit("literal")
       lit1 shouldBe a[Literal]
-      lit1.datatype shouldBe (XSDDatatype.XSDstring:Iri)
+      lit1.datatype shouldBe (XsdString)
       lit1.langTag shouldBe (None)
       
       val num:Int=3434
       val lit2=lit(num)
-      lit2.datatype shouldBe (XSDDatatype.XSDinteger:Iri)
+      lit2.datatype shouldBe (XsdInteger)
       
       val lit3=lit(34.6)
-      lit3.datatype shouldBe (XSDdouble:Iri)
+      lit3.datatype shouldBe (XsdDouble)
       
       val lit4=lit("stringa","es")
       lit4.langTag shouldBe (Some("es"))
@@ -42,11 +42,11 @@ class RdfTest extends FlatSpec with Matchers  {
       lit5 shouldBe a [Literal]
       lit5.langTag shouldBe(Some("fr"))
       
-      val lit6="another string"^^XSDstring
-      lit6.datatype shouldBe (XSDstring:Iri)
+      val lit6="another string"^^XsdString
+      lit6.datatype shouldBe (XsdString)
       
-      val lit7="34534"^^XSDinteger
-      lit7.datatype shouldBe (XSDinteger:Iri)
+      val lit7="34534"^^XsdInteger
+      lit7.datatype shouldBe (XsdInteger)
     }
     
     "a blank node" should "comply" in {

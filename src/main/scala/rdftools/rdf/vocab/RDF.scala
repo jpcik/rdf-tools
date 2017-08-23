@@ -22,4 +22,6 @@ object RDF extends Vocab {
   val subject = prop("subject")
   val `type` = prop("type")
   val a=`type`
+  
+  val langString=RDF("langString")
 }

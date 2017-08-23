@@ -20,12 +20,12 @@ class TripleTest extends FlatSpec with Matchers  {
       tri2.p shouldBe a [Iri]
       tri2.o shouldBe a [Literal]
       
-      val tri3=Triple(bnode("subj"),"prop","342"^^XSDinteger)
+      val tri3=Triple(bnode("subj"),"prop","342"^^XsdInteger)
       tri3.s shouldBe a [Bnode]
       tri3.o shouldBe a [Literal]
-      tri3.o.asInstanceOf[Literal].datatype shouldBe (XSDinteger:Iri)
+      tri3.o.asInstanceOf[Literal].datatype shouldBe (XsdInteger)
       
-      val tri4="subj" ~ "prop" ~ ("strings"^^XSDstring)
+      val tri4="subj" ~ "prop" ~ ("strings"^^XsdString)
       tri4.s shouldBe a [Iri]
       tri4.o.asLiteral.value shouldBe("strings")
       

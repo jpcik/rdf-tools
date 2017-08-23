@@ -8,7 +8,7 @@ import rdftools.rdf.RdfTools._
 import collection.JavaConversions._
 
 object JenaGraphs {
-  implicit class JenaNodePlus(jn:Node) extends RdfTerm {
+  implicit class JenaNodePlus(val jn:Node) extends RdfTerm {
     def asIri:Iri=jn.getURI
     def asBnode=bnode(jn.getBlankNodeLabel)
     def asLiteral=lit(jn.getLiteralValue)
