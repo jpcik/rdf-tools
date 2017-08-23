@@ -2,17 +2,16 @@
 package rdftools.rdf.vocab
 
 import org.apache.jena.riot.RDFDataMgr
-//import org.apache.jena.vocabulary.RDF
+import collection.JavaConverters._
 import collection.JavaConversions._
-//import org.apache.jena.vocabulary.OWL
 import org.apache.jena.rdf.model.Statement
 import com.typesafe.config.ConfigFactory
-//import org.apache.jena.vocabulary.RDFS
 import scala.io.Source
 import java.io.File
 import java.io.FileWriter
 import org.apache.jena.rdf.model.Resource
 import org.apache.jena.rdf.model.Property
+import com.typesafe.config.Config
 
 object VocabGen {  
   
@@ -61,20 +60,19 @@ object VocabGen {
     import rdftools.rdf.api.JenaTools._
 
     val localnames=toLocalName(
-      m.listStatements(null,RDF.`type`,RDF.Property)++  
-      m.listStatements(null,RDF.`type`,OWL.ObjectProperty)++
-      m.listStatements(null,RDF.`type`,OWL.DatatypeProperty))
+      m.listStatements(null,RDF.`type`,RDF.Property).asScala++  
+      m.listStatements(null,RDF.`type`,OWL.ObjectProperty).asScala++
+      m.listStatements(null,RDF.`type`,OWL.DatatypeProperty).asScala)
     val classnames=toLocalName(
-      m.listStatements(null, RDF.`type`, OWL.Class)++
-      m.listStatements(null, RDF.`type`,RDFS.Class))
+      m.listStatements(null, RDF.`type`, OWL.Class).asScala++
+      m.listStatements(null, RDF.`type`,RDFS.Class).asScala)
     
     VocabMeta(shortName,defPrefix,classnames,localnames)
   }
   
   def generateVocabs={  
-    val conf=ConfigFactory.load.getConfig("vocabGen")
-    
-    conf.getConfigList("vocabs").foreach { voc => 
+    val conf=ConfigFactory.load.getConfig("vocabGen")    
+    conf.getConfigList("vocabs").asScala.foreach { voc => 
       val meta=readVocab(voc.getString("url"))
       println(s"write vocab: $meta")
       val vocabId=voc.getString("id")

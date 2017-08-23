@@ -8,7 +8,7 @@ import org.apache.jena.sparql.core.{Quad=>JenaQuad}
 import rdftools.rdf.api.JenaGraphs._
 import org.apache.jena.riot.lang.PipedRDFIterator
 import org.apache.jena.riot.lang.PipedTriplesStream
-import collection.JavaConversions._
+import collection.JavaConverters.asScalaIteratorConverter
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 import java.io.InputStream
@@ -25,13 +25,13 @@ object RdfIO {
   def read(path:String)={
     val (pipe,str)=pipeAndStream
     Future(RDFParser.source(path).parse(str))
-    pipe.map{t=>(t:Triple)}
+    pipe.asScala.map{t=>(t:Triple)}
   }
   
   def read(inputStream:InputStream)={
     val (pipe,str)=pipeAndStream
     Future(RDFParser.source(inputStream).parse(str))
-    pipe.map{t=>(t:Triple)}
+    pipe.asScala.map{t=>(t:Triple)}
   }
  
 }

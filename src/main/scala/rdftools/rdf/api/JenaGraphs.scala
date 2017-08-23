@@ -5,7 +5,7 @@ import org.apache.jena.graph.{Graph=>JenaGraph}
 import org.apache.jena.graph.Node
 import rdftools.rdf._
 import rdftools.rdf.RdfTools._
-import collection.JavaConversions._
+import collection.JavaConverters._
 
 object JenaGraphs {
   implicit class JenaNodePlus(val jn:Node) extends RdfTerm {
@@ -28,7 +28,7 @@ object JenaGraphs {
   
   implicit class JenaGraphPlus(jg:JenaGraph) extends Graph {
     val name=None
-    lazy val triples=jg.find(null,null,null).map(t=>t:Triple).toSet
+    lazy val triples=jg.find(null,null,null).asScala.map(t=>t:Triple).toSet
   }
   
 }
