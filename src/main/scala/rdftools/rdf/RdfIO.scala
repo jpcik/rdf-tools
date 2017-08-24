@@ -4,7 +4,7 @@ import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RDFParser
 import org.apache.jena.riot.system.StreamRDF
 import org.apache.jena.graph.{Triple=>JenaTriple}
-import org.apache.jena.sparql.core.Quad
+import org.apache.jena.sparql.core.{Quad=>JenaQuad}
 import rdftools.rdf.api.JenaGraphs._
 import org.apache.jena.riot.lang.PipedRDFIterator
 import org.apache.jena.riot.lang.PipedTriplesStream

@@ -8,14 +8,14 @@ import rdftools.rdf.RdfTools._
 import collection.JavaConverters._
 
 object JenaGraphs {
-  implicit class JenaNodePlus(jn:Node) extends RdfTerm {
-    override def asIri:Iri=jn.getURI
-    override def asBnode=bnode(jn.getBlankNodeLabel)
-    override def asLiteral=lit(jn.getLiteralValue)
+  implicit class JenaNodePlus(val jenaNode:Node) extends RdfTerm {
+    override def asIri:Iri=jenaNode.getURI
+    override def asBnode=bnode(jenaNode.getBlankNodeLabel)
+    override def asLiteral=lit(jenaNode.getLiteralValue)
     def asRdfTerm:RdfTerm={
-      if (jn.isURI) jn.asIri
-      else if (jn.isLiteral) jn.asLiteral
-      else if (jn.isBlank) jn.asBnode
+      if (jenaNode.isURI) jenaNode.asIri
+      else if (jenaNode.isLiteral) jenaNode.asLiteral
+      else if (jenaNode.isBlank) jenaNode.asBnode
       else throw new ClassCastException(s"Cannot cast $this as RdfTerm")
     }
   }

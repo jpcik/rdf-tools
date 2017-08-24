@@ -14,12 +14,18 @@ trait RdfTerm {
   def asIri:Iri=throw new ClassCastException(s"Literal $this is not a Iri")
   def asLiteral:Literal=throw new ClassCastException(s"Iri $this is not a Literal")
   def asBnode:Bnode=throw new ClassCastException(s"Iri $this is not a Blank node")
+def triple(prop:Iri):Option[Triple]=None
+  def obj(prop:Iri):Option[RdfTerm]=None
+  def objs(prop:Iri):Iterator[RdfTerm]=Iterator.empty
+  def objString(prop:Iri):Option[String]=obj(prop).map { x => x.asLiteral.getString }
+  
 }
 
 trait Iri extends RdfTerm{
   val path:String
   override def asIri=this
   def ~(prop:Iri)=SubjProp(this,prop)
+  override def toString=s"$path"
 }
 
 object Iri {
@@ -49,17 +55,25 @@ trait Literal extends RdfTerm{
   val datatype:Iri
   val langTag:Option[String]
   override def asLiteral=this
+override def toString={
+    s"""\"$value\""""
+  }
+  def getString={
+    println("doobie")
+  
+    (value.asInstanceOf[String])
+  }
 }
 
 case class AnyLiteral(value:Any) extends Literal {
   import RdfTools._
   lazy val datatype:Iri=value match {
-    case s:String =>XSDDatatype.XSDstring
-    case d:Double =>XSDDatatype.XSDdouble
-    case l:Long =>XSDDatatype.XSDlong
-    case i:Int =>XSDDatatype.XSDinteger
-    case b:Boolean =>XSDDatatype.XSDboolean
-    case dt:DateTime => XSDDatatype.XSDdateTime
+    case s:String =>XsdString
+    case d:Double =>XsdDouble
+    case l:Long =>XsdLong
+    case i:Int =>XsdInteger
+    case b:Boolean =>XsdBoolean
+    case dt:DateTime => XsdDateTime
   }
   val langTag=None
 }
@@ -70,13 +84,33 @@ class TypedLiteral(anyValue:Any,dtype:Iri,lang:Option[String]) extends Literal{
   override val langTag=lang
 }
 
+
+
+
 trait Bnode extends RdfTerm {
   val id:String
   override def asBnode=this  
+  override def toString=s"_:$id"
 }
 
 case class IdBnode(id:String) extends Bnode{
 }
+
+trait Variable extends RdfTerm{
+  val varName:String
+  def asIri=throw new ClassCastException(s"Var $this is not a Iri")
+  def asLiteral=throw new ClassCastException(s"Var $this is not a Literal")
+  def asBnode=throw new ClassCastException(s"Var $this is not a Bnode")    
+  override def toString=s"?$varName"
+
+}
+
+case class NodeVariable(varName:String) extends Variable
+
+object nodeVar {
+  def apply(varName:String)=NodeVariable(varName)
+}
+
 
 trait Triple {
   val subject:RdfTerm
@@ -86,6 +120,8 @@ trait Triple {
   lazy val p=predicate
   lazy val o=_object
   def ++(tr:Triple)=Graph(this,tr)
+  override def toString=s"$s $p $o ."
+
 }
 object Triple {
   def apply(s:RdfTerm,p:Iri,o:RdfTerm):Triple=RdfTriple(s,p,o)
@@ -95,6 +131,17 @@ case class RdfTriple(subject:RdfTerm,predicate:Iri,_object:RdfTerm) extends Trip
  
 }
 
+
+trait Quad {
+  val triple:Triple
+  val graph:RdfTerm
+}
+
+object Quad {
+  def apply(s:RdfTerm,p:Iri,o:RdfTerm,g:RdfTerm):Quad=RdfQuad(Triple(s,p,o),g)
+}
+
+case class RdfQuad(triple:Triple,graph:RdfTerm) extends Quad
 
 trait Graph {
   val triples:Set[Triple]
@@ -119,7 +166,9 @@ object RdfTools{
   //implicit def str2lit(s:String)=Literal(s,null,null)
   implicit def str2iri(s:String)=Iri(s)
   implicit def iri2str(iri:Iri)=iri.toString
-  implicit def xsd2iri(xsd:XSDDatatype):Iri=xsd.toString
+  //implicit def xsd2iri(xsd:XSDDatatype):Iri=xsd.toString
+  //implicit def prop2iri(prop:Property)=prop.iri
+  //implicit def clazz2iri(clazz:Class)=clazz.iri
   
   object bnode{
     def apply(vali:String):Bnode=IdBnode(vali) 
@@ -128,16 +177,30 @@ object RdfTools{
   object lit{
   def apply(s:Any)=AnyLiteral(s)
   def apply(value:Any,lang:String)=
-    new TypedLiteral(value,XSDDatatype.XSDstring:Iri,Some(lang))
+    new TypedLiteral(value,XsdString:Iri,Some(lang))
   def apply(value:Any,datatype:Iri)=
     new TypedLiteral(value,datatype,None)
   def apply(value:Any,datatype:Iri,lang:String)=
     new TypedLiteral(value,datatype,Some(lang))
 }
   
+  implicit class RdfTermPlus(rdft:RdfTerm) {
+    /*
+  def objLiteral[T](prop:Iri,fun:Literal =>T):Option[T]={
+    obj(prop).map{t=>
+      fun(t.asLiteral)
+    }
+  }
+  def objString(prop:Iri):Option[String]=
+    objLiteral[String](prop,getString)
+    
+  def getString(lit:Literal):String=lit.value.toString
+*/
+  }
+  
   implicit class StringLiteral(str:String){
     def `@`(lang:String)=lit(str,lang)
-    def ^^(dtype:XSDDatatype)=lit(str,dtype)
+    def ^^(dtype:XsdDatatype)=lit(str,dtype)
   }
   
   def `_:` (s:String)=IdBnode(s)
