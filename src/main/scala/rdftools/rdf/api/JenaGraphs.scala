@@ -9,9 +9,9 @@ import collection.JavaConverters._
 
 object JenaGraphs {
   implicit class JenaNodePlus(jn:Node) extends RdfTerm {
-    def asIri:Iri=jn.getURI
-    def asBnode=bnode(jn.getBlankNodeLabel)
-    def asLiteral=lit(jn.getLiteralValue)
+    override def asIri:Iri=jn.getURI
+    override def asBnode=bnode(jn.getBlankNodeLabel)
+    override def asLiteral=lit(jn.getLiteralValue)
     def asRdfTerm:RdfTerm={
       if (jn.isURI) jn.asIri
       else if (jn.isLiteral) jn.asLiteral

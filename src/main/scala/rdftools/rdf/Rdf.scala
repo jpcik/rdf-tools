@@ -11,17 +11,14 @@ import scala.language.postfixOps
 import scala.reflect.ClassTag
 
 trait RdfTerm {
-
-  def asIri:Iri
-  def asLiteral:Literal
-  def asBnode:Bnode
+  def asIri:Iri=throw new ClassCastException(s"Literal $this is not a Iri")
+  def asLiteral:Literal=throw new ClassCastException(s"Iri $this is not a Literal")
+  def asBnode:Bnode=throw new ClassCastException(s"Iri $this is not a Blank node")
 }
 
 trait Iri extends RdfTerm{
   val path:String
-  def asIri=this
-  def asLiteral=throw new ClassCastException(s"Iri $this is not a Literal")
-  def asBnode=throw new ClassCastException(s"Iri $this is not a Blank node")
+  override def asIri=this
   def ~(prop:Iri)=SubjProp(this,prop)
 }
 
@@ -51,9 +48,7 @@ trait Literal extends RdfTerm{
   val value:Any
   val datatype:Iri
   val langTag:Option[String]
-  def asIri=throw new ClassCastException(s"Literal $this is not a Iri")
-  def asBnode=throw new ClassCastException(s"Literal $this is not a Blank node")
-  def asLiteral=this
+  override def asLiteral=this
 }
 
 case class AnyLiteral(value:Any) extends Literal {
@@ -75,14 +70,9 @@ class TypedLiteral(anyValue:Any,dtype:Iri,lang:Option[String]) extends Literal{
   override val langTag=lang
 }
 
-
-
-
 trait Bnode extends RdfTerm {
   val id:String
-  def asIri=throw new ClassCastException(s"Bnode $this is not a Iri")
-  def asLiteral=throw new ClassCastException(s"Bnode $this is not a Literal")
-  def asBnode=this  
+  override def asBnode=this  
 }
 
 case class IdBnode(id:String) extends Bnode{
