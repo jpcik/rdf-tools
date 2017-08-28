@@ -57,7 +57,7 @@ object VocabGen {
     def toLocalName(stms:Iterator[Statement])=
       stms.filter(isLocal).map(_.getSubject.getLocalName)
     
-    import rdftools.rdf.api.JenaTools._
+    import rdftools.rdf.jena._
 
     val localnames=toLocalName(
       m.listStatements(null,RDF.`type`,RDF.Property).asScala++  

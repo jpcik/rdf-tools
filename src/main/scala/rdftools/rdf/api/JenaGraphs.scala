@@ -7,7 +7,7 @@ import rdftools.rdf._
 import rdftools.rdf.RdfTools._
 import collection.JavaConverters._
 
-object JenaGraphs {
+object JenaGraphs {/*
   implicit class JenaNodePlus(val jenaNode:Node) extends RdfTerm {
     override def asIri:Iri=jenaNode.getURI
     override def asBnode=bnode(jenaNode.getBlankNodeLabel)
@@ -30,5 +30,5 @@ object JenaGraphs {
     val name=None
     lazy val triples=jg.find(null,null,null).asScala.map(t=>t:Triple).toSet
   }
-  
+  */
 }

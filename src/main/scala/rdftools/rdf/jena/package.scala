@@ -1,35 +1,33 @@
-package rdftools.rdf.api 
+package rdftools.rdf
 
-import org.apache.jena.graph.NodeFactory
-import org.apache.jena.graph.{Triple=>JenaTriple}
-import rdftools.rdf._
-import rdftools.rdf.RdfTools._
-import org.apache.jena.rdf.model.AnonId
-import org.apache.jena.graph.Node
-import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.jena.rdf.model.Resource
+import org.apache.jena.rdf.model.{Property=>JenaProperty}
+import org.apache.jena.rdf.model.{Literal=>JenaLiteral}
 import org.apache.jena.rdf.model.ResourceFactory
-import scala.language.implicitConversions
+import org.apache.jena.graph.{Triple=>JenaTriple}
+import org.apache.jena.graph.{Graph=>JenaGraph}
+import rdftools.rdf.Iri
+import rdftools.rdf.Class
+import org.apache.jena.graph.NodeFactory
+import rdftools.rdf.Property
+import rdftools.rdf.AnyLiteral
+import rdftools.rdf.Triple
+import org.apache.jena.graph.Node
+import language.implicitConversions
 import org.apache.jena.graph.BlankNodeId
-import org.apache.jena.graph.Node_URI
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import collection.JavaConverters._
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.RDFList
 import org.apache.jena.rdf.model.Container
-import org.apache.jena.rdf.model.{Literal=>JenaLiteral}
-import org.apache.jena.rdf.model.{Property=>JenaProperty}
-import org.apache.jena.rdf.model.RDFNode
-import org.apache.jena.rdf.model.Resource
-import org.apache.jena.riot.Lang
-import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.riot.RDFDataMgr
-import collection.JavaConversions._
 import org.apache.jena.rdf.model.Statement
+import org.apache.jena.rdf.model.RDFNode
 
+//import rdftools.rdf.Triple
 
-object JenaTools {
-  val TTL="TTL"
-  import org.apache.jena.graph.NodeFactory._
-  import org.apache.jena.datatypes.xsd.XSDDatatype._
-  /*
+package object jena {
+  //type TripleList = java.util.List[Triple]
+  
   def toJenaRes(s:String):Resource=
     ResourceFactory.createResource(s)  
 
@@ -56,8 +54,7 @@ object JenaTools {
   }
  
   def iri(n:Node)=Iri(n.getURI)
-  */
-  /*
+  
   def +=(s:Iri,p:Iri,o:Iri)(implicit m:Model)={
     m.add(toJenaRes(s),p:JenaProperty,toJenaRes(o))
   }
@@ -73,20 +70,12 @@ object JenaTools {
   } 
   def +=(s:Iri,p:Iri,cont:Container)(implicit m:Model)={
     m.add(s,p,cont)
-  } */
+  } 
   
-
-  /*
+  import NodeFactory._
+  import XSDDatatype._
+  import RdfTools._
   
-  def obj(subj:Iri,pred:Iri)(implicit m:Model)={
-    m.listObjectsOfProperty(subj, pred).map { node => node.asNode.asRdfTerm }
-  }
-  * 
-  * 
-  * */
-  
-  
-  /*
   implicit def toJenaNode(t:RdfTerm):Node=t match {
     case i:Iri=>createURI(i.toString)
     case bn:Bnode=>createBlankNode(new BlankNodeId(bn.id))
@@ -98,23 +87,39 @@ object JenaTools {
       case _=>createLiteral(l.value.toString,XSDstring)
     }
     case jn:JenaNodePlus=>jn.jenaNode 
-  }*/
-  object ModelIO{
-  def loadToModel(url:String,lang:Lang)={
-    //val m=ModelFactory.createDefaultModel
-    RDFDataMgr.loadModel(url,lang)
-   
   }
-  }
-  /*
-  implicit class ModelPlus(m:Model) {
-    def byPredicate(predIri:Iri)={
-      m.listStatements(null,predIri,null).map(stm=>stm:Triple)
+  
+   implicit class JenaNodePlus(val jenaNode:Node) extends RdfTerm {
+    override def asIri:Iri=jenaNode.getURI
+    override def asBnode=bnode(jenaNode.getBlankNodeLabel)
+    override def asLiteral=lit(jenaNode.getLiteralValue)
+    def asRdfTerm:RdfTerm={
+      if (jenaNode.isURI) jenaNode.asIri
+      else if (jenaNode.isLiteral) jenaNode.asLiteral
+      else if (jenaNode.isBlank) jenaNode.asBnode
+      else throw new ClassCastException(s"Cannot cast $this as RdfTerm")
     }
-    
-    
-  }*/
-  /*
+  }
+  
+  implicit class JenaTriplePlus(jt:JenaTriple) extends Triple {
+    lazy val subject=jt.getSubject.asRdfTerm
+    lazy val predicate=jt.getPredicate.asIri
+    lazy val _object=jt.getObject.asRdfTerm
+  }
+  
+  implicit class JenaGraphPlus(jg:JenaGraph) extends Graph {
+    val name=None
+    lazy val triples=jg.find(null,null,null).asScala.map(t=>t:Triple).toSet
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
   implicit class JenaResourcePlus(r:Resource) extends Iri {
     val path=r.getURI
      def triple(prop:Iri):Option[Triple]={
@@ -128,7 +133,7 @@ object JenaTools {
         if (o==null) None else Some(o.getObject)
     }
      def objs(prop:Iri)={
-      r.asResource.listProperties(prop).map{st=>
+      r.asResource.listProperties(prop).asScala.map{st=>
         st.o
       }
     }
@@ -165,7 +170,7 @@ object JenaTools {
     }
     def objs(prop:Iri)={
       if (r.isResource) {
-      r.asResource.listProperties(prop).map{st=>
+      r.asResource.listProperties(prop).asScala.map{st=>
         st.o
       }
       }
@@ -174,12 +179,11 @@ object JenaTools {
   }
   
   implicit class JenaStatementPlus(stm:Statement) extends Triple {
-    import JenaGraphs._
     lazy val subject:RdfTerm=stm.getSubject
     lazy val predicate:Iri=stm.getPredicate.getURI
     lazy val _object:RdfTerm=stm.getObject
   
 
   }
-*/  
+
 }

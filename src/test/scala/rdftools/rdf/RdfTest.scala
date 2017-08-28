@@ -2,16 +2,16 @@ package rdftools.rdf
 
 import org.scalatest._
 import rdftools.rdf.RdfTools._
-import org.apache.jena.datatypes.xsd.XSDDatatype
-import org.apache.jena.datatypes.xsd.XSDDatatype._
 import scala.language.postfixOps
+import scala.util.Success
+import java.net.URI
 
 class RdfTest extends FlatSpec with Matchers  {
 
     "An Iri" should "comply to: " in{
       val badIri=Iri("abc")
       badIri.localName should be ("abc")
-      badIri.asUri shouldBe defined
+      badIri.asUri shouldEqual Success(new URI("abc"))
       badIri.localName should be ("abc")
       
       val iri1:Iri="test1"
@@ -20,6 +20,7 @@ class RdfTest extends FlatSpec with Matchers  {
       val iri2:RdfTerm="some"
       iri2.asIri shouldBe a[Iri]
       an [ClassCastException] should be thrownBy (iri2.asBnode) 
+      
     }
      
     "A literal" should "make" in{
@@ -30,7 +31,7 @@ class RdfTest extends FlatSpec with Matchers  {
       
       val num:Int=3434
       val lit2=lit(num)
-      lit2.datatype shouldBe (XsdInteger)
+      lit2.datatype shouldBe (XsdInt)
       
       val lit3=lit(34.6)
       lit3.datatype shouldBe (XsdDouble)

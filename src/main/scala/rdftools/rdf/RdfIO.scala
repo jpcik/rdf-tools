@@ -5,7 +5,7 @@ import org.apache.jena.riot.RDFParser
 import org.apache.jena.riot.system.StreamRDF
 import org.apache.jena.graph.{Triple=>JenaTriple}
 import org.apache.jena.sparql.core.{Quad=>JenaQuad}
-import rdftools.rdf.api.JenaGraphs._
+import rdftools.rdf.jena._
 import org.apache.jena.riot.lang.PipedRDFIterator
 import org.apache.jena.riot.lang.PipedTriplesStream
 import collection.JavaConverters.asScalaIteratorConverter
