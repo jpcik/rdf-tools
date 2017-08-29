@@ -18,6 +18,16 @@ class GraphTest extends FlatSpec with Matchers  {
        
      g.triples.size shouldBe (5)
      
+     val g2 =
+       ":a" ~ ":p" ~ ("lit"^^XsdString) ++
+       ":b" ~ ":p" ~ ("4"^^XsdInt) ++
+       ":c" ~ ":p" ~ lit(3.4)
+ 
+     g2.triples.size shouldBe (3)
+     g2.triples should contain (Triple(":a",":p",lit("lit")))
+     g2.triples should contain (Triple(":b",":p",lit(4)))
+     g2.triples should contain (Triple(":c",":p","3.4"^^XsdDouble))
+     
        
     }    
 }

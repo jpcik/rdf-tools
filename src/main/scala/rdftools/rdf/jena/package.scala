@@ -6,12 +6,7 @@ import org.apache.jena.rdf.model.{Literal=>JenaLiteral}
 import org.apache.jena.rdf.model.ResourceFactory
 import org.apache.jena.graph.{Triple=>JenaTriple}
 import org.apache.jena.graph.{Graph=>JenaGraph}
-import rdftools.rdf.Iri
-import rdftools.rdf.Class
 import org.apache.jena.graph.NodeFactory
-import rdftools.rdf.Property
-import rdftools.rdf.AnyLiteral
-import rdftools.rdf.Triple
 import org.apache.jena.graph.Node
 import language.implicitConversions
 import org.apache.jena.graph.BlankNodeId
@@ -22,8 +17,7 @@ import org.apache.jena.rdf.model.RDFList
 import org.apache.jena.rdf.model.Container
 import org.apache.jena.rdf.model.Statement
 import org.apache.jena.rdf.model.RDFNode
-
-//import rdftools.rdf.Triple
+import org.apache.jena.rdf.model.StmtIterator
 
 package object jena {
   //type TripleList = java.util.List[Triple]
@@ -112,31 +106,27 @@ package object jena {
     lazy val triples=jg.find(null,null,null).asScala.map(t=>t:Triple).toSet
   }
   
-  
-  
-  
-  
-  
-  
-  
-  
   implicit class JenaResourcePlus(r:Resource) extends Iri {
     val path=r.getURI
-     def triple(prop:Iri):Option[Triple]={
+     override def triple(prop:Iri):Option[Triple]={
       val st=r.getProperty(prop)
       if (st==null) None else Some(st)
     }
-     def obj(prop:Iri):Option[RdfTerm]={
+     override def obj(prop:Iri):Option[RdfTerm]={
         println("doing obj "+r.getURI)
         println(prop)
         val o=r.asResource.getProperty(prop)
         if (o==null) None else Some(o.getObject)
     }
-     def objs(prop:Iri)={
+     override def objs(prop:Iri)={
       r.asResource.listProperties(prop).asScala.map{st=>
         st.o
       }
     }
+     /*
+     override def equals(other:Any)=other match{
+       case i:Iri
+     }*/
 
   }
   
@@ -150,7 +140,6 @@ package object jena {
     }
   }
 
-  
   implicit class JenaRdfNodePlus(r:RDFNode) extends RdfTerm {
     override def asIri:Iri=r.asResource
     override def asBnode=bnode(r.asResource.getId.getLabelString)
@@ -159,7 +148,12 @@ package object jena {
       if (r.isURIResource) asIri.toString
       else if (r.isLiteral) asLiteral.toString
       else asBnode.toString
-     def obj(prop:Iri):Option[RdfTerm]={
+    override def equals(other:Any)=other match{
+      case i:Iri=>r.isURIResource && i.equals(r.asIri)
+      case l:Literal=>r.isLiteral && l.equals(r.asLiteral)
+      case b:Bnode=>r.isAnon() && b.equals(r.asBnode)
+    }
+     override def obj(prop:Iri):Option[RdfTerm]={
         println("doing obj "+r.asResource.getURI)
         println(prop)
       if (r.isResource) {
@@ -168,7 +162,7 @@ package object jena {
       }
       else None
     }
-    def objs(prop:Iri)={
+    override def objs(prop:Iri)={
       if (r.isResource) {
       r.asResource.listProperties(prop).asScala.map{st=>
         st.o
@@ -182,8 +176,20 @@ package object jena {
     lazy val subject:RdfTerm=stm.getSubject
     lazy val predicate:Iri=stm.getPredicate.getURI
     lazy val _object:RdfTerm=stm.getObject
-  
+    
+    
 
   }
 
+  implicit class ModelPlus(m:Model){
+    
+    private def asTripleItr(it:StmtIterator)=it.asScala.map(stmt=>stmt:Triple)
+    def byPredicate(predicate:Iri)={
+      asTripleItr(m.listStatements(null,predicate,null))
+    }
+    def bySubject(iri:Iri)={
+      asTripleItr(m.listStatements(iri,null,null))
+    }
+    
+  }
 }
