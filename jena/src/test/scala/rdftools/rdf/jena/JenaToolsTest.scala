@@ -1,4 +1,4 @@
-package rdftools.rdf.api
+package rdftools.rdf.jena
 
 import rdftools.rdf.ParentTest
 import org.apache.jena.riot.RDFDataMgr

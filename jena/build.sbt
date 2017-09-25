@@ -1,18 +1,14 @@
-name := "rdf-tools"
+name := "rdf-tools-jena"
 organization := "ch.hevs"
 version := "0.1.2"
 scalaVersion := "2.12.3"
 
-lazy val rdftools = (project in file("."))
-
-lazy val jena = (project in file("jena")).dependsOn(rdftools)
-
-lazy val owlapi = (project in file("owlapi")).dependsOn(rdftools)
-
 //enablePlugins(JavaAppPackaging)
   
 libraryDependencies ++= Seq(
-  "joda-time" % "joda-time" % "2.9.9",
+  "org.apache.jena" % "apache-jena-libs" % "3.3.0",  
+  "com.eed3si9n" %% "treehugger" % "0.4.3",
+  "com.typesafe" % "config" % "1.3.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   "junit" % "junit" % "4.12" % "test"
 )

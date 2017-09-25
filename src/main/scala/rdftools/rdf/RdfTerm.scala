@@ -2,8 +2,13 @@ package rdftools.rdf
 
 /** An RDF term, either an IRI, literal or blank node */
 trait RdfTerm {
+  /** @return this RDF term as IRI */
   def asIri:Iri=throw new ClassCastException(s"Literal $this is not a Iri")
+  
+  /** @return this RDF term as Literal */
   def asLiteral:Literal=throw new ClassCastException(s"Iri $this is not a Literal")
+  
+  /** @return this RDF term as blank node */
   def asBnode:Bnode=throw new ClassCastException(s"Iri $this is not a Blank node")
   
   /** Obtain a triple whose subject is this RDF term, and property is `prop`. 

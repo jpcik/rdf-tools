@@ -2,8 +2,6 @@ package rdftools.rdf
 
 import org.scalatest._
 import rdftools.rdf.RdfTools._
-import org.apache.jena.datatypes.xsd.XSDDatatype
-import org.apache.jena.datatypes.xsd.XSDDatatype._
 import scala.language.postfixOps
 
 class GraphTest extends FlatSpec with Matchers  {

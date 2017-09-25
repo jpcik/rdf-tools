@@ -1,6 +1,5 @@
 package rdftools.rdf
 
-
 trait Quad {
   val triple:Triple
   val graph:RdfTerm
