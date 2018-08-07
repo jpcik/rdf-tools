@@ -3,7 +3,12 @@ organization := "ch.hevs"
 version := "0.1.2"
 scalaVersion := "2.12.3"
 
+lazy val jenaRef = LocalProject("jena")
+
+lazy val owlapiRef = LocalProject("owlapi")
+
 lazy val rdftools = (project in file("."))
+  .aggregate(jenaRef,owlapiRef)
 
 lazy val jena = (project in file("jena")).dependsOn(rdftools)
 
