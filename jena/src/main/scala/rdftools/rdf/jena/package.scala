@@ -46,6 +46,8 @@ package object jena {
   implicit def toJenaTriple(t:Triple):JenaTriple={
     new JenaTriple(t.subject ,t.predicate ,t._object )
   }
+  
+  //implicit def prop2Iri(p:JenaProperty):Iri=p.asResource
  
   def iri(n:Node)=Iri(n.getURI)
   
@@ -64,6 +66,9 @@ package object jena {
   } 
   def +=(s:Iri,p:Iri,cont:Container)(implicit m:Model)={
     m.add(s,p,cont)
+  } 
+  def +=(s:Iri,p:Iri,lit:Literal)(implicit m:Model)={
+    m.add(s,p,lit.getString)
   } 
   
   import NodeFactory._

@@ -16,7 +16,8 @@ trait Literal extends RdfTerm{
     case _ => false
   }
   def getString={  
-    value.asInstanceOf[String]
+    value.toString
+    //value.asInstanceOf[String]
   }
 }
 

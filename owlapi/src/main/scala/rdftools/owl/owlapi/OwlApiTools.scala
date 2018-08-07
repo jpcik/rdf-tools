@@ -36,6 +36,7 @@ object OwlApiTools {
   }
   
   def individual(iri:Iri)=f.getOWLNamedIndividual(iri)
+  def individual(bn:Bnode)=f.getOWLAnonymousIndividual(bn.id)
   def individual(name:String)(implicit prefixes:PrefixManager)={
     f.getOWLNamedIndividual(name, prefixes)
   }
