@@ -1,9 +1,10 @@
 package rdftools.rdf
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
+import org.scalatest._
+import flatspec._
+import matchers._
 
-trait ParentTest  extends FlatSpec with Matchers  {
+trait ParentTest  extends AnyFlatSpec with should.Matchers  {
   def time[T](str: String)(thunk: => T): T = {
     print(str + "... ")
     val t1 = System.currentTimeMillis

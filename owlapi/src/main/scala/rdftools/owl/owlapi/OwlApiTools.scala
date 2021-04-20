@@ -67,6 +67,11 @@ object OwlApiTools {
       case d:Double=>f.getOWLFacetRestriction(facet, d)
       case fl:Float=>f.getOWLFacetRestriction(facet, fl)
       case l:OWLLiteral=>f.getOWLFacetRestriction(facet, l)
+      case tl:TypedLiteral=>tl.datatype match {
+        case XsdInteger=>f.getOWLFacetRestriction(facet,tl.value.toString.toInt)
+        case XsdDouble=>f.getOWLFacetRestriction(facet,tl.value.toString.toDouble)
+        case XsdFloat=>f.getOWLFacetRestriction(facet,tl.value.toString.toFloat)
+      }            
     }
     def length(a:Any)=transform(a,OWLFacet.LENGTH)
     def minLength(a:Any)=transform(a,OWLFacet.MIN_LENGTH)

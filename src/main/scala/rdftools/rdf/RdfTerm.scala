@@ -1,5 +1,7 @@
 package rdftools.rdf
 
+import rdftools.rdf.vocab.RDF
+
 /** An RDF term, either an IRI, literal or blank node */
 trait RdfTerm {
   /** @return this RDF term as IRI */
@@ -36,5 +38,8 @@ trait RdfTerm {
    *  @return a string option if there is a match, none otherwise */
   def objString(prop:Iri):Option[String]=
     obj(prop).map( x => x.asLiteral.getString )
+
+  def a(iri:Iri)=
+    Triple(this,RDF.`type`.iri,iri)
 
 }

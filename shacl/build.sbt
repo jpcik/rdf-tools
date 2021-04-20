@@ -1,10 +1,9 @@
-name := "rdf-tools-owlapi"
+name := "rdf-tools-shacl"
   
 libraryDependencies ++= Seq(
-  "net.sourceforge.owlapi" % "owlapi-api" % "4.0.0",
-  "net.sourceforge.owlapi" % "owlapi-apibinding" % "4.0.0",
-  "org.scalatest" %% "scalatest" % "3.2.7" % "test",
-  "junit" % "junit" % "4.12" % "test"
+  "org.codehaus.groovy" % "groovy" % "3.0.7" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.7" % Test,
+  "junit" % "junit" % "4.12" % Test
 )
 
 resolvers ++= Seq(

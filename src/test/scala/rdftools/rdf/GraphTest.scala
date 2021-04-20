@@ -1,10 +1,12 @@
 package rdftools.rdf
 
 import org.scalatest._
+import flatspec._
+import matchers._
 import rdftools.rdf.RdfTools._
 import scala.language.postfixOps
 
-class GraphTest extends FlatSpec with Matchers  {
+class GraphTest extends AnyFlatSpec with should.Matchers  {
 
     "A Graph" should "comply to: " in{
      val g=

@@ -58,7 +58,28 @@ object RdfTools{
   
   def `_:` (s:String)=IdBnode(s)
   
+  def __ (s:String)=IdBnode(s)
+
+implicit class BnodeHelper(val sc: StringContext) extends AnyVal {
+  def bnode(args: Any*): Bnode = IdBnode(sc.s(args))
+}
+
   def <(str:String)={
     Iri(str)
+  }
+
+implicit class IriHelper(val sc: StringContext) extends AnyVal {
+
+  def iri(args:Any*)={
+    
+        val irs=sc.parts.reduce(_+_)
+        if (irs.contains(':')){
+            val pref=irs.substring(0,irs.indexOf(':'))
+            println(pref)
+            val pp=Prefixes.prefixDic.getOrElse(pref,"").toString
+            Iri(irs.replaceFirst(pref+":",pp))
+        }
+        else Iri(irs)
+    }
   }
 }

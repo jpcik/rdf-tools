@@ -34,6 +34,7 @@ case class SimpleIri(value:String) extends Iri{
   val path= value
   lazy val localName=value.split(Array('/','#')).last
   def +(str:String):Iri=SimpleIri(value+str)
+  def +(anotherIri:Iri):Iri= this.+(anotherIri.path)
   def asUri=Try(new URI(value))//.toOption
   def > = this
 }

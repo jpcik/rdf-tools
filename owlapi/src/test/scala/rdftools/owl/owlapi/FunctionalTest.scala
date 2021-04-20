@@ -1,7 +1,7 @@
 package rdftools.owl.owlapi
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 import rdftools.owl.owlapi.OwlApiTools._
 import rdftools.owl.owlapi.Functional._
 import rdftools.rdf.RdfTools._
@@ -18,7 +18,7 @@ import rdftools.rdf.XsdNonNegativeInteger
 import rdftools.rdf.XsdNonPositiveInteger
 import rdftools.rdf.XsdPositiveInteger
 
-class FunctionalTest extends FlatSpec with Matchers{
+class FunctionalTest extends AnyFlatSpec with should.Matchers{
   
   /** example of ontology from OWL 2 Spec:
   Prefix(:=<http://www.example.com/ontology1#>)
