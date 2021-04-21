@@ -23,13 +23,15 @@ object OwlApiTools {
   }
   implicit def clazz2OwlCLass(c:Class)=f.getOWLClass(c.iri)
   implicit def iri2Range(iri:Iri)=f.getOWLDatatype(iri)
+  implicit def range2Iri(range:OWLDataRange)=Iri(range.asOWLDatatype.getIRI.toString)
   
   def createOntology(iri:Iri)=om.createOntology(iri)
   
   implicit class OwlStringContext(sc:StringContext)(implicit prefixes:PrefixManager) {
     def i(args:Any*)=OwlApiTools.individual(sc.parts.mkString)
-    def ind(args:Any*)=i(args) 
+    def individual(args:Any*)=i(args) 
     def c(args:Any*)=OwlApiTools.Class(sc.parts.mkString)
+    def clazz(args:Any*)=c(args)
     def op(args:Any*)=OwlApiTools.objectProperty(sc.parts.mkString)
     def dp(args:Any*)=OwlApiTools.dataProperty(sc.parts.mkString)
     def ap(args:Any*)=OwlApiTools.annotationProperty(sc.parts.mkString)

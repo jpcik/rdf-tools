@@ -267,8 +267,23 @@ object Functional {
       o.getObjectPropertyAssertionAxioms(ind).asScala.map(_.getProperty)
       
     def objectPropertyObjects(ind:OWLIndividual)=
-      o.getObjectPropertyAssertionAxioms(ind).asScala.map(t=>(t.getProperty,t.getObject))
+      o.getObjectPropertyAssertionAxioms(ind).asScala.map{t=>
+        val obj = if (t.getObject.isNamed) t.getObject.asOWLNamedIndividual
+          else t.getObject.asOWLAnonymousIndividual
+        (t.getProperty.asOWLObjectProperty(),obj)}
     
+    def dataPropertyObjects(ind:OWLIndividual)=
+      o.getDataPropertyAssertionAxioms(ind).asScala.map{a=>
+        (a.getProperty.asOWLDataProperty,a.getObject)}
+
+    def subClassesOf(clazz:OWLClass)=
+      o.getSubClassAxiomsForSuperClass(clazz).asScala
+
+    def +=(axioms:OWLAxiom*)={
+      axioms.foreach{axiom=>
+        o.getOWLOntologyManager().applyChange(new AddAxiom(o,axiom))
+      }
+    }
     
   }
 }

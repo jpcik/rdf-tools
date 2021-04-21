@@ -1,155 +1,254 @@
 package rdftools.owl.owlapi
 
+import collection.JavaConverters._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 import rdftools.owl.owlapi.OwlApiTools._
 import rdftools.owl.owlapi.Functional._
 import rdftools.rdf.RdfTools._
-import rdftools.rdf.vocab.RDFS
-import rdftools.rdf.vocab.OWL
-import collection.JavaConverters._
 import rdftools.rdf.XsdInteger
 import rdftools.rdf.XsdDouble
 import rdftools.rdf.XsdFloat
-import org.semanticweb.owlapi.vocab.OWLFacet
 import rdftools.rdf.XsdInt
 import rdftools.rdf.XsdString
 import rdftools.rdf.XsdNonNegativeInteger
 import rdftools.rdf.XsdNonPositiveInteger
 import rdftools.rdf.XsdPositiveInteger
+import rdftools.rdf.Iri
+import rdftools.rdf.vocab.RDFS
+import rdftools.rdf.vocab.OWL
+import org.semanticweb.owlapi.model.OWLAnonymousIndividual
+import org.semanticweb.owlapi.vocab.OWLFacet
+import org.semanticweb.owlapi.model.OWLClass
 
 class FunctionalTest extends AnyFlatSpec with should.Matchers{
   
-  /** example of ontology from OWL 2 Spec:
-  Prefix(:=<http://www.example.com/ontology1#>)
-  Ontology( <http://www.example.com/ontology1>
-    Import( <http://www.example.com/ontology2> )
-    Annotation( rdfs:label "An example" )
+  // example of ontology from OWL 2 Spec:
 
-    SubClassOf( :Child owl:Thing )
-  ) 
-  */
   implicit val pref=createPrefixManager
-  
 
   Prefix("a:","http://example.org/")
 
-  val hasAge=dataProperty("a:hasAge")
-  val meg=i"a:Meg"
-
-  "ontology" should "be loaded" in {
+  "An ontology" should "be loaded in Functional Style" in {
     
+    info("""Ontology:
+      Prefix(:=<http://www.example.com/ontology1#>)
+      Ontology( <http://www.example.com/ontology1>
+        Import( <http://www.example.com/ontology2> )
+        Annotation( rdfs:label "An example" )
+
+        SubClassOf( :Child owl:Thing )
+      ) """)
+
     Prefix(":","http://www.example.com/ontology1#")
     val onto=
       Ontology("http://www.example.com/ontology1",
         Imports ("http://www.example.com/ontology2"),
         Annotation(RDFS.label, lit("An example")),
-        SubClassOf (Class(":Child"),OWL.Thing)
+        SubClassOf (clazz":Child",OWL.Thing)
       )
     
     onto.getImportsDeclarations.size shouldBe (1)
     onto.getAnnotations.size should be (1)
     onto.getAxiomCount should be (1)
-    val subclass=onto.getSubClassAxiomsForSuperClass(OWL.Thing).asScala.head.getSubClass
+    val subclass=onto.subClassesOf(OWL.Thing).head.getSubClass
     subclass.asOWLClass.getIRI.getNamespace shouldBe ("http://www.example.com/ontology1#")
   }
   
-  /** example
-   *  DataPropertyRange( a:hasAge xsd:integer ) 	The range of the a:hasAge property is xsd:integer.
-      DataPropertyAssertion( a:hasAge a:Meg "17"^^xsd:double ) 	Meg is seventeen years old. 
-   */
-  "data ranges" should "be defined" in {
-    DataPropertyRange(hasAge, XsdInteger)
-    DataPropertyAssertion(hasAge, meg, "17"^^XsdDouble)
+  val ontology=
+    Ontology("http://www.example.com/ontology2")
+
+  val hasAge=dataProperty("a:hasAge")
+  val meg=individual("a:Meg")
+
+  "A data range" should "be defined" in {
+
+    info("""Axioms:
+      DataPropertyRange( a:hasAge xsd:integer )                 The range of the a:hasAge property is xsd:integer.
+      DataPropertyAssertion( a:hasAge a:Meg "17"^^xsd:double )  Meg is seventeen years old. """)
+
+    ontology +=(
+      DataPropertyRange(hasAge, XsdInteger),
+      DataPropertyAssertion(hasAge, meg, "17"^^XsdDouble) 
+    )
+
+    val rangeAxiom=ontology.getDataPropertyRangeAxioms(hasAge).asScala.head
+    rangeAxiom.getRange.asIri should be (XsdInteger)
+    val (prop,obj)=ontology.dataPropertyObjects(meg).head
+    obj.parseDouble should be (17)
+    prop should be (hasAge)
+    obj.getDatatype.asIri should be (XsdDouble)
+    
   }
   
-  /** example
-   *  DataPropertyAssertion( a:numberOfChildren a:Meg "+0"^^xsd:float ) 	The value of a:numberOfChildren for a:Meg is +0.
-      DataPropertyAssertion( a:numberOfChildren a:Meg "-0"^^xsd:float ) 	The value of a:numberOfChildren for a:Meg is -0.
-      FunctionalDataProperty( a:numberOfChildren ) 	An individual can have at most one value for a:numberOfChildren. 
-   */
-  "functional data porperty" should "be defined" in {
-     val numberOfChildren=dataProperty("a:numberOfChildren")
-     DataPropertyAssertion(numberOfChildren, ind"a:Meg", "+0"^^XsdFloat)
-     DataPropertyAssertion(numberOfChildren, ind"a:Meg", "-0"^^XsdFloat)
-     FunctionalDataProperty(numberOfChildren)
+  "A functional data property" should "be defined" in {
      
-     println (numberOfChildren)
-  }
-  
-  "a class" should "be defined" in {
-    //SubClassOf( a:Child a:Person ) 	Each child is a person. 
-    SubClassOf( c"a:Child", c"a:Person" )
+    info("""Axioms:
+      DataPropertyAssertion( a:numberOfChildren a:Meg "+0"^^xsd:float ) 	The value of a:numberOfChildren for a:Meg is +0.
+      DataPropertyAssertion( a:numberOfChildren a:Meg "-0"^^xsd:float ) 	The value of a:numberOfChildren for a:Meg is -0.
+      FunctionalDataProperty( a:numberOfChildren ) 	                      An individual can have at most one value for a:numberOfChildren. """)    
     
+    val numberOfChildren=dataProperty("a:numberOfChildren")
+
+    ontology +=(
+      DataPropertyAssertion(numberOfChildren, meg, "+0"^^XsdFloat),
+      DataPropertyAssertion(numberOfChildren, meg, "-0"^^XsdFloat),
+      FunctionalDataProperty(numberOfChildren)
+    )
+
+    val childrenAssertions=ontology.dataPropertyObjects(meg)
+      .filter(p=>p._1.equals(numberOfChildren))
+    childrenAssertions.size should be (2)
+
+    val functional=ontology.getFunctionalDataPropertyAxioms(numberOfChildren).asScala.head
+    functional.size should be (1)
+     
   }
   
-  "a datatype" should "be defined" in {
-    //DataPropertyRange( a:hasAge xsd:integer ) 	The range of the a:hasAge data property is xsd:integer. 
-    DataPropertyRange(hasAge, XsdInteger)
-  }
-  
-  "an object property" should "be defined" in {
-    //ObjectPropertyAssertion( a:parentOf a:Peter a:Chris ) 	Peter is a parent of Chris. 
-    ObjectPropertyAssertion(op"a:parentOf", ind"a:Peter", ind"a:Chris")
+  val Child=clazz"a:Child"
+  val Person=clazz"a:Person"
+
+  "A subclass assertion " should "be defined" in {
     
-    val lois=i"a:Lois"
-    val peter=ind"a:Peter"
-    val hasName=dp"a:hasName"
+    info("SubClassOf( a:Child a:Person ) 	Each child is a person. ")
+
+    val subClass = SubClassOf( Child, Person )
+    subClass.getSubClass should be (Child)
+    subClass.getSuperClass should be (Person)
+
+  }
+  
+  "A datatype range" should "be defined" in {
+
+    info("DataPropertyRange( a:hasAge xsd:integer ) 	The range of the a:hasAge data property is xsd:integer.") 
+    val range = 
+      DataPropertyRange(hasAge, XsdInteger)
+    (range.getRange:Iri) should be (XsdInteger)
+  }
+  
+  val peter=individual"a:Peter"
+  val chris=individual"a:Chris"
+
+  "An object property" should "be defined" in {
+
+    info("ObjectPropertyAssertion( a:parentOf a:Peter a:Chris ) 	Peter is a parent of Chris. ")
+    val opAssertion=
+      ObjectPropertyAssertion(op"a:parentOf", peter, chris)
+    
+    opAssertion.getSubject should be (peter)
+    opAssertion.getObject should be (chris)
+  }
+
+  val lois=i"a:Lois"
+  val hasName=dp"a:hasName"
+
+  "A data property assertion" should "be defined" in {
+
     // DataPropertyAssertion( a:hasName a:Peter "Peter Griffin" ) 
-    DataPropertyAssertion(hasName, peter, lit("Peter Griffin"))
+    val nameAssertion =
+      DataPropertyAssertion(hasName, peter, lit("Peter Griffin"))
+
+    nameAssertion.getObject.getLiteral should be ("Peter Griffin")
+    nameAssertion.getSubject should be (peter)
+    nameAssertion.getProperty should be (hasName)
+  }
+
+  "An annotation assertion" should "be declared" in {
+    info("""AnnotationAssertion( rdfs:comment a:Peter "The father of the Griffin family from Quahog." ) """)
+    val annotation = 
+      AnnotationAssertion(peter.getIRI, Annotation(RDFS.comment, lit("The father of the Griffin family from Quahog.")))
     
-    //AnnotationAssertion( rdfs:comment a:Peter "The father of the Griffin family from Quahog." )
-    AnnotationAssertion(peter.getIRI, Annotation(RDFS.comment, lit("The father of the Griffin family from Quahog.")))
+    annotation.getAnnotation.getValue.asLiteral.get.getLiteral  should startWith ("The father of")
+  }
+  
+  "A class assertion" should "be declared" in {
+    info("ClassAssertion( a:Person a:Peter ) 	Peter is a person. ")
+    val classAssertion=
+      ClassAssertion(Person, peter)
     
-    //ClassAssertion( a:Person a:Peter ) 	Peter is a person. 
-    ClassAssertion(c"a:Person", peter)
+    classAssertion.getClassExpression.asOWLClass should be (Person)
+    classAssertion.getIndividual should be (peter)
+  }
     
-    //ObjectPropertyAssertion( a:livesAt a:Peter _:a1 ) 	Peter lives at some (unknown) address. 
-    //ObjectPropertyAssertion( a:city _:a1 a:Quahog ) 	This unknown address is in the city of Quahog and...
-    //ObjectPropertyAssertion( a:state _:a1 a:RI ) 	...in the state of Rhode Island. 
-    ObjectPropertyAssertion(op"a:livesAt", peter,bnode("a1"))
-    ObjectPropertyAssertion(op"a:city", bnode("a1"), ind"a:Quahog")
-    ObjectPropertyAssertion(op"a:state", bnode("a1"), ind"a:RI")
+  "A blank node" should "be declared in an object property assertion" in {
+    info("""Axioms: 
+      ObjectPropertyAssertion( a:livesAt a:Peter _:a1 ) Peter lives at some (unknown) address. 
+      ObjectPropertyAssertion( a:city _:a1 a:Quahog )   This unknown address is in the city of Quahog and...
+      ObjectPropertyAssertion( a:state _:a1 a:RI ) 	    ...in the state of Rhode Island. """")
     
-    //Declaration( Class( a:Person ) )
-    //Declaration( NamedIndividual( a:Peter ) ) 
-    Declaration(Class("a:Person"))
-    Declaration(NamedIndividual("a:Peter"))
+    ontology += (
+      ObjectPropertyAssertion(op"a:livesAt", peter,bnode("a1")),
+      ObjectPropertyAssertion(op"a:city", bnode("a1"), individual"a:Quahog"),
+      ObjectPropertyAssertion(op"a:state", bnode("a1"), individual"a:RI")
+    )
+
+    val (prop,obj) = ontology.objectPropertyObjects(peter).head
+    obj.asOWLAnonymousIndividual.getID.getID should be ("_:a1")
+    ontology.objectPropertyObjects(bnode("a1")).size should be (2)
+  }
     
-    //Ontology( <http://www.my.example.com/example>
-    //    Declaration( Class( a:Person ) )
-    //    Declaration( NamedIndividual( a:Peter ) )
-    //    ClassAssertion( a:Person a:Peter )
-    //) 
-    val Person=Class("a:Person")
+  "Class and individual declarations" should "be defined" in {
+
+    info("""
+      Declaration( Class( a:Person ) )
+      Declaration( NamedIndividual( a:Peter ) ) """)
+      
+    val personDecl = Declaration(Class("a:Person"))
+    val peterDecl =  Declaration(NamedIndividual("a:Peter")) 
+    personDecl.getEntity.asOWLClass should be (Person)
+    peterDecl.getEntity.asOWLNamedIndividual should be (peter)
+    
+    info("""Ontology( <http://www.my.example.com/example>
+      Declaration( Class( a:Person ) )
+      Declaration( NamedIndividual( a:Peter ) )
+      ClassAssertion( a:Person a:Peter )
+    )""")
+
     val o=Ontology("http://www.my.example.com/example",
         Declaration(Person) ::
         Declaration(peter) ::
         ClassAssertion(Person, peter)
     )
-   
     o.getIndividualsInSignature().size shouldBe (1)
+    o.getClassesInSignature().size should be (1)
+
+  }
     
-    //ClassAssertion( a:Dog a:Brian ) 	Brian is a dog.
-    //ClassAssertion( a:Species a:Dog ) 	Dog is a species.  
-    ClassAssertion(c"a:Dog", i"a:Brian")
-    ClassAssertion(c"a:Species",i"a:Dog")
-   
-    
-    //ClassAssertion( a:Dog a:Brian ) 	Brian is a dog.
-    //ClassAssertion( a:PetAnimals a:Dog ) 	Dogs are pet animals.
-    //AnnotationAssertion( a:addedBy a:Dog "Seth MacFarlane" ) 	The IRI a:Dog has been added to the ontology by Seth MacFarlane. 
+  "Class Assertions" should "be declared" in {
+    info("""
+      ClassAssertion( a:Dog a:Brian ) 	Brian is a dog.
+      ClassAssertion( a:Species a:Dog ) 	Dog is a species.  """)
+
+    val brianIsDog =   ClassAssertion(c"a:Dog", i"a:Brian")
+    val dogIsSpecies = ClassAssertion(c"a:Species",i"a:Dog")
+    brianIsDog.getIndividual should be (brian)
+    dogIsSpecies.getIndividual.asOWLNamedIndividual.getIRI should be (Dog.getIRI) 
+
+    info("""
+      ClassAssertion( a:Dog a:Brian ) 	Brian is a dog.
+      ClassAssertion( a:PetAnimals a:Dog ) 	Dogs are pet animals.
+      AnnotationAssertion( a:addedBy a:Dog "Seth MacFarlane" ) 	The IRI a:Dog has been added to the ontology by Seth MacFarlane. """)
     ClassAssertion(c"a:Dog",i"a:Brian")
     ClassAssertion(c"a:PetAnimals", i"a:Dog")
+    val dogAnnnot = 
+      AnnotationAssertion(ap"a:addedBy", c"a:Dog".getIRI, lit("Seth McFarlane"))
     
-    AnnotationAssertion(ap"a:addedBy", c"a:Dog".getIRI, lit("Seth McFarlane"))
+    dogAnnnot.getSubject.toString should be (Dog.getIRI.toString)
+  }
     
-     //ObjectInverseOf( a:fatherOf ) 
-    val fatherOf=op"a:fatherOf"
+  val fatherOf=op"a:fatherOf"
+
+  "Inverse of axiom" should "be defined" in {
+    info("ObjectInverseOf( a:fatherOf ) ")
     ObjectInverseOf(fatherOf)
+      .getInverse.asOWLObjectProperty() should be (fatherOf)
+  }
     
-    // DataIntersectionOf( xsd:nonNegativeInteger xsd:nonPositiveInteger ) 
-    DataIntersectionOf(XsdNonNegativeInteger,XsdNonPositiveInteger)
+  "Intersection axiom" should "be declared" in {
+    info("DataIntersectionOf( xsd:nonNegativeInteger xsd:nonPositiveInteger ) ")
+    DataIntersectionOf(XsdNonNegativeInteger,XsdNonPositiveInteger) 
+      .getOperands.asScala.map(_.asIri) should contain(XsdNonNegativeInteger,XsdNonPositiveInteger)
+  }
     
    //  DataUnionOf( xsd:string xsd:integer ) 
     DataUnionOf(XsdString,XsdInteger)
@@ -195,7 +294,6 @@ class FunctionalTest extends AnyFlatSpec with should.Matchers{
     ObjectComplementOf(c"a:Bird")
     
     val stewie=i"a:Stewie"
-    val chris=i"a:Chris"
     EquivalentClasses( c"a:GriffinFamilyMember",
       ObjectOneOf( peter,lois,stewie,meg,chris,brian)) 	
 
@@ -336,7 +434,6 @@ class FunctionalTest extends AnyFlatSpec with should.Matchers{
     SubClassOf(Man, Person, Set(Annotation(RDFS.comment.iri, lit("Male people are people"))))
     SubClassOf(Man,Person)
     
-    val Child=c"a:Child"
     val Baby=c"a:Baby"
     //SubClassOf( a:Baby a:Child ) 	Each baby is a child.
     //SubClassOf( a:Child a:Person ) 	Each child is a person.
@@ -375,13 +472,28 @@ class FunctionalTest extends AnyFlatSpec with should.Matchers{
     ClassAssertion(Man,chris)
     ClassAssertion(Boy, stewie)
 
+
+    val MongrelOwner=c"a:MongrelOwner"
+    val Mongrel=c"a:Mongrel"
+    val DogOwner=c"a:DogOwner"
+    val Peter=i"a:Peter"
+
+    EquivalentClasses(MongrelOwner,ObjectSomeValuesFrom(hasPet,Mongrel))
+    EquivalentClasses(DogOwner,ObjectSomeValuesFrom(hasPet,Dog))
+    SubClassOf(Mongrel,Dog)
+    ClassAssertion(MongrelOwner,Peter)
+    SubClassOf(MongrelOwner,DogOwner)
+
     //EquivalentClasses( a:MongrelOwner ObjectSomeValuesFrom( a:hasPet a:Mongrel ) ) 	A mongrel owner has a pet that is a mongrel.
     //EquivalentClasses( a:DogOwner ObjectSomeValuesFrom( a:hasPet a:Dog ) ) 	A dog owner has a pet that is a dog.
     //SubClassOf( a:Mongrel a:Dog ) 	Each mongrel is a dog.
     //ClassAssertion( a:MongrelOwner a:Peter ) 	Peter is a mongrel owner.
     //SubClassOf( a:MongrelOwner a:DogOwner )
     
-
+    DisjointClasses(Boy,Girl)
+    ClassAssertion(Boy,stewie)
+    ObjectComplementOf(Girl)
+    ClassAssertion(Girl,stewie)
 
     //DisjointClasses( a:Boy a:Girl ) 	Nothing can be both a boy and a girl.
     //ClassAssertion( a:Boy a:Stewie ) 	Stewie is a boy.
@@ -390,6 +502,9 @@ class FunctionalTest extends AnyFlatSpec with should.Matchers{
 
 
 
+    DisjointUnion(Child,Boy,Girl)
+    ClassAssertion(Child,stewie)
+    ClassAssertion(ObjectComplementOf(Girl),stewie)
 
     //DisjointUnion( a:Child a:Boy a:Girl ) 	Each child is either a boy or a girl, each boy is a child, each girl is a child, and nothing can be both a boy and a girl.
     //ClassAssertion( a:Child a:Stewie ) 	Stewie is a child.
@@ -398,6 +513,6 @@ class FunctionalTest extends AnyFlatSpec with should.Matchers{
 
 
     
-  }
+  
   
 }
