@@ -1,6 +1,13 @@
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package rdftools.rdf
 
 import language.implicitConversions
+import rdftools.rdf.xsd._
 
 object RdfTools{
   //implicit def str2lit(s:String)=Literal(s,null,null)

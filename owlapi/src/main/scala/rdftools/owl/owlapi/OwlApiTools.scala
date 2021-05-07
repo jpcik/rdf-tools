@@ -3,6 +3,7 @@ package rdftools.owl.owlapi
 import language.implicitConversions
 import org.semanticweb.owlapi.apibinding.OWLManager
 import rdftools.rdf._
+import rdftools.rdf.xsd._
 import rdftools.rdf.RdfTools._
 import org.semanticweb.owlapi.model._
 import org.semanticweb.owlapi.util.DefaultPrefixManager
@@ -80,10 +81,10 @@ object OwlApiTools {
     def maxLength(a:Any)=transform(a,OWLFacet.MAX_LENGTH)
     def pattern(s:String)=transform(lit(s),OWLFacet.PATTERN)
     def langRange(s:String)=transform(lit(s),OWLFacet.LANG_RANGE)
-    def <= (a:Any)=transform(a,OWLFacet.MIN_INCLUSIVE)
-    def < (a:Any)=transform(a,OWLFacet.MIN_EXCLUSIVE)
-    def >= (a:Any)=transform(a,OWLFacet.MAX_INCLUSIVE)
-    def > (a:Any)=transform(a,OWLFacet.MAX_EXCLUSIVE)
+    def minInclusive(a:Any)=transform(a,OWLFacet.MIN_INCLUSIVE)
+    def minExclusive(a:Any)=transform(a,OWLFacet.MIN_EXCLUSIVE)
+    def maxInclusive(a:Any)=transform(a,OWLFacet.MAX_INCLUSIVE)
+    def maxExclusive(a:Any)=transform(a,OWLFacet.MAX_EXCLUSIVE)
        
   }
  

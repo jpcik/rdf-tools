@@ -6,14 +6,7 @@ import org.scalatest.matchers._
 import rdftools.owl.owlapi.OwlApiTools._
 import rdftools.owl.owlapi.Functional._
 import rdftools.rdf.RdfTools._
-import rdftools.rdf.XsdInteger
-import rdftools.rdf.XsdDouble
-import rdftools.rdf.XsdFloat
-import rdftools.rdf.XsdInt
-import rdftools.rdf.XsdString
-import rdftools.rdf.XsdNonNegativeInteger
-import rdftools.rdf.XsdNonPositiveInteger
-import rdftools.rdf.XsdPositiveInteger
+import rdftools.rdf.xsd._
 import rdftools.rdf.Iri
 import rdftools.rdf.vocab.RDFS
 import rdftools.rdf.vocab.OWL
@@ -247,20 +240,40 @@ class FunctionalTest extends AnyFlatSpec with should.Matchers{
   "Intersection axiom" should "be declared" in {
     info("DataIntersectionOf( xsd:nonNegativeInteger xsd:nonPositiveInteger ) ")
     DataIntersectionOf(XsdNonNegativeInteger,XsdNonPositiveInteger) 
-      .getOperands.asScala.map(_.asIri) should contain(XsdNonNegativeInteger,XsdNonPositiveInteger)
+      .getOperands.asScala.map(_.asIri) should (
+        contain(XsdNonNegativeInteger) and contain (XsdNonPositiveInteger) )
   }
     
-   //  DataUnionOf( xsd:string xsd:integer ) 
+  "Data union axiom" should "be declared" in {
+    info("DataUnionOf( xsd:string xsd:integer )" )
     DataUnionOf(XsdString,XsdInteger)
+      .getOperands.asScala.map(_.asIri) should (
+        contain(XsdString) and contain (XsdInteger))
+ 
+  }  
     
-    // DataComplementOf( xsd:positiveInteger ) 
+  "Data ComplementOf axiom" should "be declared" in {
+    info("DataComplementOf( xsd:positiveInteger ) ")
     DataComplementOf(XsdPositiveInteger)
-    
-    // DataOneOf( "Peter" "1"^^xsd:integer ) 
+      .getDataRange.asOWLDatatype.asIri should be(XsdPositiveInteger)   
+  }
+
+  "Data OneOf restriction axioms" should "be declared" in {
+    info("""DataOneOf( "Peter" "1"^^xsd:integer )""")
     DataOneOf(lit("Peter"),"1"^^XsdInteger)
+      .getValues.asScala.map(_.getLiteral) should (
+        contain ("Peter") and contain ("1"))
+  }
+    
+  "Datatype restriction" should "be declared" in {
     import Facets._
-    //DatatypeRestriction( xsd:integer xsd:minInclusive "5"^^xsd:integer xsd:maxExclusive "10"^^xsd:integer ) 
-    DatatypeRestriction(XsdInteger,  Set(Facets.<=("5"^^XsdInteger),Facets.>=("10"^^XsdInteger)))
+
+    info("""DatatypeRestriction( xsd:integer xsd:minInclusive "5"^^xsd:integer xsd:maxExclusive "10"^^xsd:integer )  """)
+    val restriction=
+      DatatypeRestriction(XsdInteger,  Set( minInclusive("5"^^XsdInteger),maxExclusive("10"^^XsdInteger)))
+    restriction.getDatatype.asIri should be (XsdInteger)
+    restriction.getFacetRestrictions.asScala.map(_.getFacet) should contain (OWLFacet.MIN_INCLUSIVE)
+  }
     
     
     //ClassAssertion( a:Dog a:Brian ) 	Brian is a dog.

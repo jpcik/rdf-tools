@@ -1,3 +1,9 @@
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package rdftools.rdf
 
 trait Variable extends RdfTerm{

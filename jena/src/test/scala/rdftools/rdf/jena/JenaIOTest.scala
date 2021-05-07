@@ -1,3 +1,9 @@
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package rdftools.rdf.jena
 
 import rdftools.rdf.ParentTest

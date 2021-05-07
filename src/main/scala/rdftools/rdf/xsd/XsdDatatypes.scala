@@ -1,23 +1,12 @@
-package rdftools.rdf
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+package rdftools.rdf.xsd
 
 import rdftools.rdf.RdfTools.lit
-
-class XsdDatatype(value:String) extends Iri{
-  val xsdIri="http://www.w3.org/2001/XMLSchema#"
-  val path=xsdIri+value
-}
-
-object XsdDatatype {
-  
-  val types=Seq(
-    XsdString,XsdDouble,XsdDecimal,XsdLong,
-    XsdInteger,XsdBoolean,XsdDateTime) 
-    .map(dt=>dt.path->dt).toMap
-  
-  def resolve(datatypeUri:String)={
-    types.get(datatypeUri)
-  }
-}
 
 //Real, Decimal and Integers
 object XsdDecimal extends XsdDatatype("decimal")
@@ -63,5 +52,3 @@ object XsdAnyUri extends XsdDatatype("anyUri")
 
 object XsdDateTime extends XsdDatatype("dateTime")
 object XsdDateTimeStamp extends XsdDatatype("dateTimeStamp")
-
-

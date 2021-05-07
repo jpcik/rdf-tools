@@ -3,6 +3,7 @@ package rdftools.owl.owlapi
 import language.implicitConversions
 import org.semanticweb.owlapi.apibinding.OWLManager
 import rdftools.rdf._
+import rdftools.rdf.xsd._
 import org.semanticweb.owlapi.model._
 import rdftools.rdf.vocab.RDFS
 import rdftools.rdf.vocab.OWL

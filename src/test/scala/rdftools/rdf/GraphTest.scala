@@ -1,9 +1,16 @@
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package rdftools.rdf
 
 import org.scalatest._
 import flatspec._
 import matchers._
 import rdftools.rdf.RdfTools._
+import rdftools.rdf.xsd._
 import scala.language.postfixOps
 
 class GraphTest extends AnyFlatSpec with should.Matchers  {

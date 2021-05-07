@@ -1,3 +1,9 @@
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package rdftools.rdf
 
 import org.apache.jena.rdf.model.Resource
@@ -113,6 +119,7 @@ package object jena {
   
   implicit class JenaResourcePlus(r:Resource) extends Iri {
     val path=r.getURI
+    /*
      override def triple(prop:Iri):Option[Triple]={
       val st=r.getProperty(prop)
       if (st==null) None else Some(st)
@@ -127,7 +134,7 @@ package object jena {
       r.asResource.listProperties(prop).asScala.map{st=>
         st.o
       }
-    }
+    }*/
      /*
      override def equals(other:Any)=other match{
        case i:Iri
@@ -158,6 +165,7 @@ package object jena {
       case l:Literal=>r.isLiteral && l.equals(r.asLiteral)
       case b:Bnode=>r.isAnon() && b.equals(r.asBnode)
     }
+    /*
      override def obj(prop:Iri):Option[RdfTerm]={
         println("doing obj "+r.asResource.getURI)
         println(prop)
@@ -174,7 +182,7 @@ package object jena {
       }
       }
       else Iterator.empty
-    }
+    }*/
   }
   
   implicit class JenaStatementPlus(stm:Statement) extends Triple {

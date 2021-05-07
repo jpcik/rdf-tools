@@ -1,3 +1,9 @@
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package rdftools.rdf.jena
 
 import rdftools.rdf.ParentTest
@@ -39,8 +45,8 @@ class JenaToolsTest extends ParentTest{
     p2s should contain (Triple(":a",":p2",":c")) 
     //p2s should contain (Triple(":c",":p2",":e")) 
    
-    m.byPredicate(":p1").foreach { t => 
-      println(t.s.triple(":p2")) }
-    println(m.getResource(":c").triple(":p3"))
+    //m.byPredicate(":p1").foreach { t => 
+    //  println(t.s.triple(":p2")) }
+    //println(m.getResource(":c").triple(":p3"))
   }
 }

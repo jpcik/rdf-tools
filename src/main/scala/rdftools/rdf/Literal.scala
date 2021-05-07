@@ -1,6 +1,13 @@
+/*
+ * Copyright 2017 Jean-Paul Calbimonte
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package rdftools.rdf
 
 import org.joda.time.DateTime
+import rdftools.rdf.xsd._
 
 trait Literal extends RdfTerm{
   val value:Any
