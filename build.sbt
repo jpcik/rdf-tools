@@ -50,6 +50,13 @@ lazy val shacl = (project in file("shacl"))
     headerLicense := license )
   .dependsOn(jena % "compile->compile;test->test")
 
+lazy val r2rml = (project in file("r2rml"))
+  .settings(
+    libraryDependencies ++= commonDependencies,
+    headerLicense := license )
+  .dependsOn(jena % "compile->compile;test->test")
+
+
 resolvers ++= Seq(
 //  "typesafe" at "https://repo.typesafe.com/typesafe/releases/",
   Resolver.sonatypeRepo("public")

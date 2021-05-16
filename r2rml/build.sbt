@@ -1,7 +1,9 @@
-name := "rdf-tools-shacl"
+name := "rdf-tools-r2rml"
   
 libraryDependencies ++= Seq(
-  "org.codehaus.groovy" % "groovy" % "3.0.7" % Test 
+  "org.codehaus.groovy" % "groovy" % "3.0.7" % Test,
+  "com.github.tototoshi" %% "scala-csv" % "1.3.7"
+
 )
 
 resolvers ++= Seq(
